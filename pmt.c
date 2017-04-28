@@ -10,26 +10,55 @@
 double photoelec(int photons);
 double dynodeElec(double in, double E);
 double photontoelectrons(int photons, double V[], int dynodes);
-void gnuplotit();
+void gnuplotit(double min, double max, double stddev, double mean);
+double* findmean();
+double findstddev(double mean);
+double* getvoltages(double maxvolt, int dynodes);
+double findgain();
 
 //assume photons are all 400 nm
 int main(){
 	int numdynodes = 11; //number of dynodes, 1 less because reasons
-	double V[11] = {337.5, 562.5, 675, 787.5, 1012.5, 1237.5, 
-		1350, 1462.5, 1575, 1687.5, 1800}; 
+	//double V[11] = {337.5, 562.5, 675, 787.5, 1012.5, 1237.5, 
+		//1350, 1462.5, 1575, 1687.5, 1800}; 
+	double* V = getvoltages(1800, numdynodes);
 	//voltage array to describe voltages at each stage
 	//following 3:2:1:1:1...:1
 	//int r[]; //resistor chain array: to be implemented
 	double quantumeff = .25; //quantum efficiency @ 400 nm, approx
 	int photon;
 	double electrons = 0;
-	FILE *temp = fopen("data.dat", "w+");
-	for (photon = 0; photon < 10000; photon++) {
+	FILE *temp = fopen("data.dat", "w");
+	for (photon = 0; photon < 1000000; photon++) {
 		electrons = photontoelectrons(1, V, numdynodes);
-		if (electrons > 1) fprintf(temp, "%lf \n", electrons);
+		if (electrons > 1) {
+			fprintf(temp, "%lf\n", electrons);
+		}
 	}
-	gnuplotit();
+	int t = fclose(temp);
+	double *values;
+	values = findmean();
+	double stddev = findstddev(*(values+2));
+	gnuplotit(*(values), *(values+1), stddev, *(values+2));
 	return 0;
+}
+
+//follow 3:2:1:1:1...:1 and calculate voltages based on max voltage & num dynodes
+double* getvoltages(double maxvolt, int dynodes) {
+	int i;
+	double interval = 0;
+	static double* voltages;
+	if (dynodes < 3) {
+		return 0;
+	} else {
+		interval = maxvolt/((double)dynodes+5.0);
+		for (i = 0; i < dynodes; i++) {
+			if (i == 0) voltages[i] = 3*interval;
+			else if (i == 1) voltages[i] = voltages[i-1] + 2*interval;
+			else voltages[i] = voltages[i-1] + interval;
+		}
+	return voltages;
+	}
 }
 
 
@@ -73,10 +102,45 @@ double photontoelectrons(int photons, double V[], int dynodes) {
 	return electrons;
 }
 
+//simple implementations to pass to gnuplot
+double* findmean() {
+	FILE *tmp = fopen("data.dat", "r");
+	static double values[3];
+	double dummy;
+	double min = 1000000.0;
+	double max = 0.0;
+	double mean = 0.0;
+	int num = 0;
+	while (fscanf(tmp, "%lf", &(dummy)) != EOF) {
+		num++;
+		mean += dummy;
+
+		if (dummy > max) max = dummy;
+		if (min > dummy) min = dummy;
+	}
+	int t = fclose(tmp);
+	mean = mean/(double)num;
+	values[0] = min;
+	values[1] = max;
+	values[2] = mean;
+	return values;
+}
+double findstddev(double mean) {
+	FILE *tmp = fopen("data.dat", "r");
+	double stddev, dummy, num;
+	while (fscanf(tmp, "%lf", &(dummy)) != EOF) {
+		num++;
+		stddev += pow(dummy - mean, 2);
+	}
+	int t = fclose(tmp);
+	return sqrt(stddev/num);
+}
 
 //plot with gnuplot
-void gnuplotit() {
-	int t = system("./test1.pg");
+void gnuplotit(double min, double max, double stddev, double mean) {
+	char command[400] = {0};
+	snprintf(command, sizeof(command), "gnuplot -c test1.pg %g %g %g %g", min, max, stddev, mean);
+	int t = system(command);
 }
 
 
