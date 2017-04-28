@@ -9,7 +9,7 @@
 
 int main(){
 	int numdynodes = 12; //number of dynodes
-	double V[]; //voltage array to describe voltages at each stage
+	double V[14]; //voltage array to describe voltages at each stage
 	//int r[]; //resistor chain array: to be implemented
 	double quantumeff = .25; //quantum efficiency @ 400 nm, approx
 	
@@ -53,10 +53,12 @@ double photontoelectrons(int photons, double V[], int dynodes) {
 	double lastvolt = 0.0;
 	double voltdrop;
 	int i;
-	for (i = 0; i < dynodes; ++i) {
-		voltdrop = V[i]
+	for (i = 0; i < dynodes; i++) {
+		voltdrop = V[i] - lastvolt;
+		electrons += dynodeElec(electrons, voltdrop);
+		lastvolt = V[i];
 	}
-
+	return electrons;
 }
 
 

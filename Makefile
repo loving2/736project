@@ -1,13 +1,13 @@
 
 INCDIR=.
 CC=gcc
-CFLAGS=-I$(INCDIR) -O2 -std=c99 -lrt
+CFLAGS=-I$(INCDIR) -O2 -lm -lrt
 LIBS=
 
-DEPS = frame.h readwrite.h cobs.h rs485uart.h
-OBJ = frame.o readwrite.o cobs.o rs485uart.o
+DEPS = rnglib.h ranlib.h
+OBJ = rnglib.o ranlib.o
 
-BIN = frame_test cobs_test readwrite_test serialtest echo chatter
+BIN = pmt
 
 all: $(BIN)
 
