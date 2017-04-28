@@ -7,16 +7,28 @@
 #include "ranlib.h"
 //#include "pmt.h"
 
+double photoelec(int photons);
+double dynodeElec(double in, double E);
+double photontoelectrons(int photons, double V[], int dynodes);
+void gnuplotit();
+
+//assume photons are all 400 nm
 int main(){
-	int numdynodes = 12; //number of dynodes
-	double V[14]; //voltage array to describe voltages at each stage
+	int numdynodes = 11; //number of dynodes, 1 less because reasons
+	double V[11] = {337.5, 562.5, 675, 787.5, 1012.5, 1237.5, 
+		1350, 1462.5, 1575, 1687.5, 1800}; 
+	//voltage array to describe voltages at each stage
+	//following 3:2:1:1:1...:1
 	//int r[]; //resistor chain array: to be implemented
 	double quantumeff = .25; //quantum efficiency @ 400 nm, approx
-	
-	
-	
-	
-	
+	int photon;
+	double electrons = 0;
+	FILE *temp = fopen("data.dat", "w+");
+	for (photon = 0; photon < 10000; photon++) {
+		electrons = photontoelectrons(1, V, numdynodes);
+		if (electrons > 1) fprintf(temp, "%lf \n", electrons);
+	}
+	gnuplotit();
 	return 0;
 }
 
@@ -59,6 +71,12 @@ double photontoelectrons(int photons, double V[], int dynodes) {
 		lastvolt = V[i];
 	}
 	return electrons;
+}
+
+
+//plot with gnuplot
+void gnuplotit() {
+	int t = system("./test1.pg");
 }
 
 
