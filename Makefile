@@ -20,7 +20,7 @@ $(BIN): %: $(OBJ) %.o
 .PHONY: clean
 
 clean:
-	rm -f *.o *~ core $(INCDIR)/*~ $(BIN) data.dat histogram.png
+	rm -f *.o *~ core $(INCDIR)/*~ $(BIN)
 
 
 

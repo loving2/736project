@@ -1,0 +1,47 @@
+#!/usr/bin/gnuplot
+clear
+reset
+
+set terminal png
+set output "gainplot.png"
+
+set xlabel "Voltage (V)"
+#set xrange [min:max]
+set auto x
+
+set ylabel "Gain"
+#set yrange [1:100000]
+#set logscale y
+set auto y
+
+#set style data histogram
+set title "Gain of PMT vs Voltage"
+#set grid
+set key off
+
+#width=(max-min)/n #interval width
+#width = 1000
+
+#function used to map a value to the intervals
+#hist(x)=width*(floor((x-min)/width)+0.5)+min
+
+#bin_number(x) = floor(x/width)
+#hist(x) = width * (bin_number(x) + 0.5)
+
+#to put an empty boundary around the
+#data inside an autoscaled graph.
+#set offset graph 0.05,0.05,0.05,0.0
+
+#set xtics min, (max-min)/5, max
+#set boxwidth 900
+#set style fill solid 0.5 noborder #fillstyle
+#set tics out nomirror
+#count and plot
+
+#set label 1 gprintf("Mean = %g", mean) at (max+min)/2, 1150
+#set label 2 gprintf("Standard Deviation = %g", stddev) at (max+min)/2, 1000
+#set label 3 gprintf("Number of initial photons = %g", 1000000) at (max+min)/2, 850
+#set label 4 gprintf("Operating voltage = %g V", 1800) at (max+min)/2, 700
+
+plot "gain.dat"
+
