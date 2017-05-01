@@ -5,7 +5,7 @@
 
 #include "rnglib.h"
 #include "ranlib.h"
-//#include "pmt.h"
+
 
 double photoelec(int photons);
 double dynodeElec(double in, double E);
