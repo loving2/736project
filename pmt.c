@@ -57,7 +57,8 @@ double findgain(double V[], int numdynodes, double quantumeff) {
 double* getvoltages(double maxvolt, int dynodes) {
 	int i;
 	double interval = 0;
-	double voltages[dynodes+1];
+	//double voltages[dynodes+1];
+	double* voltages = (double*)malloc((dynodes + 1) * sizeof(double));
 	if (dynodes < 3) {
 		return 0;
 	} else {
