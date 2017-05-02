@@ -1,0 +1,18 @@
+#!/usr/bin/gnuplot
+clear
+reset
+
+set terminal png
+set output "gainplot.png"
+
+set xlabel "Voltage (V)"
+set auto x
+
+set ylabel "Gain"
+set auto y
+
+set title "Gain of PMT vs Voltage"
+set grid
+set key off
+
+plot "gain.dat"
