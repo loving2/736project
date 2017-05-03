@@ -17,19 +17,16 @@ double findgain(double V[], int numdynodes, double quantumeff);
 //assume photons are all 400 nm
 int main(){
 	int numdynodes = 12; //number of dynodes
-	double* V = getvoltages(1800, numdynodes);
+	double* V = getvoltages(2000, numdynodes);
 	//voltage array to describe voltages at each stage
 	//following 3:2:1:1:1...:1
 	//int r[]; //resistor chain array: to be implemented
 	double quantumeff = 0.25; //quantum efficiency @ 400 nm, approx
-	int i;
+	FILE *temp = fopen("degrade1.dat", "w");
 	double gain = 0;
-	FILE *temp = fopen("gain.dat", "w");
-	double interval = 25;
-	for (i = 0; i < 80; i++) {
-		V = getvoltages((2000 - (double)i*interval), numdynodes);
+	for (quantumeff = 0.25; quantumeff > 0.0001; quantumeff = quantumeff - 0.0001) {
 		gain = findgain(V, numdynodes, quantumeff);
-		fprintf(temp, "%lf %lf\n", (2000 - (double)i*interval), gain);
+		fprintf(temp, "%lf %lf\n", quantumeff, gain);
 	}
 	int t = fclose(temp);
 	gnuplotit();
@@ -116,7 +113,7 @@ double photontoelectrons(int photons, double V[], int dynodes, double quantumeff
 //plot with gnuplot
 void gnuplotit() {
 	char command[400] = {0};
-	snprintf(command, sizeof(command), "gnuplot voltagevgain.pg");
+	snprintf(command, sizeof(command), "gnuplot degrade.pg");
 	int t = system(command);
 }
 
