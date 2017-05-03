@@ -54,7 +54,7 @@ double findgain(double V[], int numdynodes, double quantumeff, double denominato
 			num = num + 1;
 		}
 	}
-	mean = mean/num;
+	if (num > 0) mean = mean/num;
 	return mean;
 }
 
