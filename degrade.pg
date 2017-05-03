@@ -3,24 +3,24 @@ clear
 reset
 
 set terminal png
-set output "degradeplot.png"
+set output "degradeplot2.png"
 #set output "dynodeplot.png"
 
-set xlabel "Quantum Efficiency of Photocathode"
+set xlabel "Poisson mean for secondary emission"
 #set xlabel "Number of Dynodes"
 set auto x
 
 set ylabel "Gain"
 set auto y
 
-set title "Gain of PMT vs QE"
+set title "Gain of PMT vs Mean"
 set grid
 set key off
 
-a = 2000;
-set label 1 gprintf("Operating Voltage = %g V", a) at .1, 1264000
-b = 1000000;
-set label 2 gprintf("Total photons = %g", b) at .1, 1254000
+#a = 2000;
+#set label 1 gprintf("Operating Voltage = %g V", a) at .1, 1264000
+#b = 1000000;
+#set label 2 gprintf("Total photons = %g", b) at .1, 1254000
 
-plot "degrade1.dat"#, "degrade2.dat"
+plot "degrade2.dat"
 #plot "dynode.dat" with linespoints
