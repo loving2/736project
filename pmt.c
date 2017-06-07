@@ -2,17 +2,17 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
-
 #include "rnglib.h"
 #include "ranlib.h"
 
 
 double photoelec(int photons, double quantumeff);
-double dynodeElec(double in, double E, double denominator);
-double photontoelectrons(int photons, double V[], int dynodes, double quantumeff, double denominator);
+double dynodeElec(double in, double E);
+double photontoelectrons(int photons, double V[], int dynodes, double quantumeff);
 void gnuplotit();
 double* getvoltages(double maxvolt, int dynodes);
-double findgain(double V[], int numdynodes, double quantumeff, double denominator);
+double findgain(double V[], int numdynodes, double quantumeff);
+double thermelec(double T);
 
 //assume photons are all 400 nm
 int main(){
@@ -24,31 +24,39 @@ int main(){
 	double quantumeff = 0.25; //quantum efficiency @ 400 nm, approx
 	FILE *temp = fopen("degrade2.dat", "w");
 	double gain = 0;
-	double voltdrop = V[0];
-	double denominator = 348061.0;
+	int i;
 	
-	double exponent;
-	double delta;
-	
-	for (denominator = 348061.0; denominator > 100; denominator = denominator - 100) {
-		exponent = (voltdrop - 950)*(voltdrop - 950)/denominator;
-		delta = 12*exp(-exponent);
-		gain = findgain(V, numdynodes, quantumeff, denominator);
-		fprintf(temp, "%lf %lf\n", delta, gain);
+	double interval = 25;
+	for (i = 0; i < 80; i++) {
+		V = getvoltages((2000 - (double)i*interval), numdynodes);
+		gain = findgain(V, numdynodes, quantumeff);
+		fprintf(temp, "%lf %lf\n", (2000 - (double)i*interval), gain);
 	}
 	int t = fclose(temp);
 	gnuplotit();
 	return 0;
 }
 
+//return expected number of electrons from thermionic emission at temperature T
+double thermelec(double T) {
+	double workfunc = 2; //assume 2eV work function for bialkali photocathode
+	double area = M_PI*(65/1000)^2/4; //area in m^2 of photocathode
+	double temp = T+273.15; //convert to Kelvin
+	double A = 1.2*pow(10,6); //Richardson's constant in A/m^2/K^2
+	double boltzman = 8.6173303*pow(10,-5); //Boltzmann's constant in eV/K
+	double currentdensity = A*temp*temp*exp(-workfunc/boltzman/temp);
+	return currentdensity*area;
+
+}
+
 //calculate number of electrons generated per photon and then average all together to get average gain
-double findgain(double V[], int numdynodes, double quantumeff, double denominator) {
+double findgain(double V[], int numdynodes, double quantumeff) {
 	double electrons = 0;
 	double num = 0;
 	double mean = 0;
 	int photon;
 	for (photon = 0; photon < 1000000; photon++) {
-		electrons = photontoelectrons(1, V, numdynodes, quantumeff, denominator);
+		electrons = photontoelectrons(1, V, numdynodes, quantumeff);
 		if (electrons > 1) {
 			mean += electrons;
 			num = num + 1;
@@ -89,14 +97,14 @@ double photoelec(int photons, double quantumeff) {
 }
 
 // simulate number of secondary electrons from # coming and energy E
-double dynodeElec(double in, double E, double denominator) {
+double dynodeElec(double in, double E) {
 	//20eV, on average energy needed 
 	//to get 1 secondary emission electron
 	//assume gaussian fit to secondary electron emission
 	//12 electrons is max, around 950 eV
 	//should look like 12*exp{-(x-950)^2/348061}
 	if (E < 0.0) return 0.0;
-	double exponent = (E - 950.0)*(E - 950.0)/denominator;
+	double exponent = (E - 950.0)*(E - 950.0)/348061.0;
 	double delta = 12.0*exp(-exponent);
 	double mean;
 	//mean number of secondary electrons created by incoming electrons with energy E
