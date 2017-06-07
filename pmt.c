@@ -40,7 +40,7 @@ int main(){
 //return expected number of electrons from thermionic emission at temperature T
 double thermelec(double T) {
 	double workfunc = 2; //assume 2eV work function for bialkali photocathode
-	double area = M_PI*(65/1000)^2/4; //area in m^2 of photocathode
+	double area = M_PI*pow(65/1000,2)/4; //area in m^2 of photocathode
 	double temp = T+273.15; //convert to Kelvin
 	double A = 1.2*pow(10,6); //Richardson's constant in A/m^2/K^2
 	double boltzman = 8.6173303*pow(10,-5); //Boltzmann's constant in eV/K
@@ -113,14 +113,14 @@ double dynodeElec(double in, double E) {
 }
 
 //simulate sequence of dynodes with voltages in V[]
-double photontoelectrons(int photons, double V[], int dynodes, double quantumeff, double denominator) {
+double photontoelectrons(int photons, double V[], int dynodes, double quantumeff) {
 	double electrons = photoelec(photons, quantumeff);
 	double lastvolt = 0;
 	double voltdrop;
 	int i;
 	for (i = 0; i < dynodes+2; i++) {//+1 for anode stage
 		voltdrop = V[i] - lastvolt;
-		electrons += dynodeElec(electrons, voltdrop, denominator);
+		electrons += dynodeElec(electrons, voltdrop);
 		lastvolt = V[i];
 	}
 	return electrons;
