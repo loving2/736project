@@ -1,0 +1,27 @@
+#!/usr/bin/gnuplot
+clear
+reset
+
+set terminal png
+set output "degradeplot2.png"
+#set output "dynodeplot.png"
+
+set xlabel "Poisson mean for secondary emission of one electron"
+#set xlabel "Number of Dynodes"
+set auto x
+
+set ylabel "Gain"
+set logscale y
+set auto y
+
+set title "Gain of PMT vs Poisson Mean"
+set grid
+set key off
+
+a = 2000;
+set label 1 gprintf("Operating Voltage = %g V", a) at 2, 1264000
+b = 1000000;
+set label 2 gprintf("Total photons = %g", b) at 2, 154000
+
+plot "degrade2.dat"
+#plot "dynode.dat" with linespoints

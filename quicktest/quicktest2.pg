@@ -1,0 +1,41 @@
+#!/usr/bin/gnuplot
+clear
+reset
+
+set terminal png
+set output "quicktest2.png"
+
+set xlabel "Electrons"
+#set xrange [min:max]
+set auto x
+
+set ylabel "Frequency"
+#set yrange [1:100000]
+#set logscale y
+
+set style data histogram
+set title "Gain of PMT"
+#set grid
+set key off
+
+#width=(max-min)/n #interval width
+width = 10
+
+#function used to map a value to the intervals
+#hist(x)=width*(floor((x-min)/width)+0.5)+min
+
+bin_number(x) = floor(x/width)
+hist(x) = width * (bin_number(x) + 0.5)
+
+#to put an empty boundary around the
+#data inside an autoscaled graph.
+#set offset graph 0.05,0.05,0.05,0.0
+
+#set xtics min, (max-min)/5, max
+set boxwidth 9
+set style fill solid 0.5 noborder #fillstyle
+set tics out nomirror
+#count and plot
+
+plot "quicktest2.dat" u (hist($1)):(1.0) smooth freq w boxes
+
