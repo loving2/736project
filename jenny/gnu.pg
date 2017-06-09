@@ -5,7 +5,7 @@ reset
 set terminal png
 set output "test.png"
 
-set xlabel "Electrons"
+set xlabel "Relative Number of Electrons (a.u.)"
 #set xrange [min:max]
 set auto x
 

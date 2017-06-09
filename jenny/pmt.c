@@ -54,7 +54,7 @@ int main(){
 
 		if (electrons > 0) fprintf(temp, "%lf\n", electrons);*/
 	}
-	printf("Total number of photons: %d", totalphot);
+	printf("Total number of photons: %d\n", totalphot);
 	int t = fclose(temp);
 	gnuplotit();
 	return 0;
