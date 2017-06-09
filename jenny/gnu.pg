@@ -3,25 +3,34 @@ clear
 reset
 
 set terminal png
-set output "degradeplot2.png"
-#set output "dynodeplot.png"
+set output "test.png"
 
-set xlabel "Poisson mean for secondary emission of one electron"
-#set xlabel "Number of Dynodes"
+set xlabel "Electrons"
+#set xrange [min:max]
 set auto x
 
-set ylabel "Gain"
-set logscale y
-set auto y
+set ylabel "Frequency"
+#set yrange [1:100000]
+#set logscale y
 
-set title "Gain of PMT vs Poisson Mean"
-set grid
+set style data histogram
+set title "Gain of PMT"
+#set grid
 set key off
 
-a = 2000;
-set label 1 gprintf("Operating Voltage = %g V", a) at 2, 1264000
-b = 1000000;
-set label 2 gprintf("Total photons = %g", b) at 2, 154000
+width = 10000
 
-plot "degrade2.dat"
-#plot "dynode.dat" with linespoints
+bin_number(x) = floor(x/width)
+hist(x) = width * (bin_number(x) + 0.5)
+
+#to put an empty boundary around the
+#data inside an autoscaled graph.
+#set offset graph 0.05,0.05,0.05,0.0
+
+set boxwidth .9*width
+set style fill solid 0.5 noborder #fillstyle
+set tics out nomirror
+#count and plot
+
+plot "noise.dat" u (hist($1)):(1.0) smooth freq w boxes
+
