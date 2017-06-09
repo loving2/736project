@@ -18,7 +18,7 @@ set title "Gain of PMT"
 #set grid
 set key off
 
-width = 10000
+width = .4
 
 bin_number(x) = floor(x/width)
 hist(x) = width * (bin_number(x) + 0.5)

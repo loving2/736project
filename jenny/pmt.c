@@ -26,8 +26,8 @@ int main(){
 	double timelength = 1; //1 second for simulation
 	double timestep = 50*pow(10,-9); //50 ns for pulse
 	FILE *temp = fopen("noise.dat", "w");
-	int i, j;
-	
+	int i, j, totalphot;
+	totalphot = 0;
 	double photons = 0;
 
 	double electrons = 0;
@@ -37,9 +37,10 @@ int main(){
 		electrons = 0;
 
 		photons = (double)ignpoi((float)(hitrate*timestep));//number photons incident on photocathode in timestep
+		totalphot += photons;
 
 		electrons = photontoelectrons(photons, V, numdynodes, quantumeff);
-		if (electrons > 0) fprintf(temp, "%lf\n", electrons);
+		if (electrons > 0) fprintf(temp, "%lf\n", 5+electrons/10000);
 
 		electrons = 0;//reset for thermionic emission
 		
@@ -53,6 +54,7 @@ int main(){
 
 		if (electrons > 0) fprintf(temp, "%lf\n", electrons);*/
 	}
+	printf("Total number of photons: %d", totalphot);
 	int t = fclose(temp);
 	gnuplotit();
 	return 0;
