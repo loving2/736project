@@ -19,11 +19,12 @@ int main(){
 	int numdynodes = 12; //number of dynodes
 	double* V = getvoltages(1700, numdynodes);
 	//voltage array to describe voltages at each stage
-	//following 3:2:1:1:1...:1
+	//following 8:4:1:1:1...:1
 	//int r[]; //resistor chain array: to be implemented
 	double quantumeff = 0.25; //quantum efficiency @ 400 nm, approx
-	double hitrate = 1000; //photon packets per second incident on photocathode
-	double photonpacket = 1; //number of photons in packet
+//	double hitrate = 2000000; //photon packets per second incident on photocathode
+	double hitrate = 20000; //photon packets per second incident on photocathode
+	double photonpacket = 3; //number of photons in packet
 	double timelength = 50; //time for simulation in seconds
 	double timestep = 50*pow(10,-9); //50 ns for pulse
 	FILE *temp = fopen("noise.dat", "w");
@@ -31,23 +32,19 @@ int main(){
 	totalphot = 0;
 	double photons = 0;
 
-	double electrons = 0;
+	double electrons;
 	double lastvolt, voltdrop;
 	
 	for (i = 0; i < (int)(timelength/timestep); i++) {
-		if (i > pow(10,8) && i < pow(10,9)/5 && photonpacket < 2) photonpacket = 2;
-		else if (i > pow(10,9)/5 && i < pow(10,9)/4 && photonpacket < 3) photonpacket = 3;
-		else if (i > pow(10,9)/5 && i < pow(10,9)/2 && photonpacket < 4) photonpacket = 4;
-		else if (i > pow(10,9)/5 && i < pow(10,9) && photonpacket < 5) photonpacket = 5;
 		electrons = 0;
-
-		photons = (double)ignpoi((float)(photonpacket*hitrate*timestep));//number photons incident on photocathode in timestep
+		//number photons incident on photocathode in timestep, poisson sampled
+		photons = (double)ignpoi((float)(photonpacket*hitrate*timestep));
 		totalphot += photons;
 
 		electrons = photontoelectrons(photons, V, numdynodes, quantumeff);
 		if (electrons > 0) fprintf(temp, "%lf\n", 1+electrons/10000);
 
-		electrons = 0;//reset for thermionic emission
+/*		electrons = 0;//reset for thermionic emission
 		
 		electrons = ignpoi(thermelec(20)*timestep);
 		lastvolt = 0;
@@ -57,9 +54,9 @@ int main(){
 			lastvolt = V[j];
 		}
 
-		if (electrons > 0) fprintf(temp, "%lf\n", 1+electrons/10000);
+		if (electrons > 0) fprintf(temp, "%lf\n", 1+electrons/10000);*/
 	}
-	printf("Total number of photoelectrons: %d\n", totalphot);
+	printf("Total number of photons: %d\n", totalphot);
 	int t = fclose(temp);
 	gnuplotit();
 	return 0;
